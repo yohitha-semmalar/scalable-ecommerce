@@ -1,0 +1,4 @@
+export function hash(key:string):number {let h=2166136261;for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=Math.imul(h,16777619)}h^=h>>>16;h=Math.imul(h,0x85ebca6b);h^=h>>>13;return h>>>0}
+export function ring(shards:string[],vnodes=32){return shards.flatMap(shard=>Array.from({length:vnodes},(_,i)=>({point:hash(`${shard}:v${i}`),shard}))).sort((a,b)=>a.point-b.point)}
+export function assign(key:string,shards:string[],vnodes=32){const r=ring(shards,vnodes);if(!r.length)throw new Error('At least one shard is required');return (r.find(n=>n.point>=hash(key))??r[0]).shard}
+export function compare(keys:string[],before:string[],after:string[]){const consistent=keys.filter(k=>assign(k,before)!==assign(k,after)).length;const modulo=keys.filter(k=>before[hash(k)%before.length]!==after[hash(k)%after.length]).length;return {consistent,modulo}}

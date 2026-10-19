@@ -1,0 +1,9 @@
+{
+  "source": "Illustrative dataset — replace with Member 5's Locust run identifier",
+  "simulated": true,
+  "results": [
+    {"scenario":"Low","users":10,"throughput":48,"average":42,"median":38,"p95":74,"p99":102,"errorRate":0},
+    {"scenario":"Medium","users":100,"throughput":380,"average":88,"median":72,"p95":160,"p99":240,"errorRate":0.2},
+    {"scenario":"High","users":500,"throughput":1120,"average":210,"median":170,"p95":420,"p99":650,"errorRate":1.8}
+  ]
+}

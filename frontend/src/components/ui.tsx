@@ -1,0 +1,13 @@
+import {useState,type ReactNode} from 'react';
+import {Link} from 'react-router-dom';
+import {Plus,ArrowRight,Package,AlertCircle} from 'lucide-react';
+import {useStoreContext} from '../app/providers';
+import {money} from '../lib/commerce';
+import type {Product} from '../types';
+export function ProductImage({product,className=''}:{product:Product;className?:string}){const [failed,setFailed]=useState(false);return failed?<div className={'image-fallback '+className}><Package size={40}/><span>{product.name}</span></div>:<img className={className} src={product.images[0]} alt={product.name} loading="lazy" onError={()=>setFailed(true)}/>}
+export function ProductCard({product:p}:{product:Product}){const {add}=useStoreContext();return <article className="product-card"><Link className="product-photo" to={'/products/'+p.id}><ProductImage product={p}/>{p.originalPrice&&<span className="tag">Save {Math.round((1-p.price/p.originalPrice)*100)}%</span>}{!p.stock&&<span className="tag sold">Sold out</span>}</Link><div className="product-meta"><div><p className="eyebrow">{p.category==='home'?'Home & living':p.category}</p><Link to={'/products/'+p.id} className="product-name">{p.name}</Link><p className="price">{money(p.price)} {p.originalPrice&&<del>{money(p.originalPrice)}</del>}</p></div><button className="icon add" aria-label={'Add '+p.name+' to bag'} disabled={!p.stock||add.isPending} onClick={()=>add.mutate({id:p.id,quantity:1})}><Plus size={18}/></button></div></article>}
+export function ProductGrid({products}:{products:Product[]}){return <div className="product-grid">{products.map(p=><ProductCard key={p.id} product={p}/>)}</div>}
+export function Loading(){return <div className="skeletons" role="status" aria-label="Loading"><div/><div/><div/><span className="sr-only">Loading…</span></div>}
+export function ErrorState({error,retry}:{error:Error|null;retry?:()=>void}){return <div className="error-state" role="alert"><AlertCircle size={22}/><h3>Something needs attention</h3><p>{error?.message||'This service is unavailable.'}</p>{retry&&<button className="btn secondary" onClick={retry}>Try again</button>}</div>}
+export function Empty({title,children}:{title:string;children?:ReactNode}){return <div className="empty"><Package size={40}/><h2>{title}</h2>{children}</div>}
+export function SectionTitle({eyebrow,title,to,label='View all'}:{eyebrow?:string;title:string;to?:string;label?:string}){return <div className="section-title"><div>{eyebrow&&<p className="eyebrow">{eyebrow}</p>}<h2>{title}</h2></div>{to&&<Link className="text-link" to={to}>{label}<ArrowRight size={17}/></Link>}</div>}
