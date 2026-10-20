@@ -1,0 +1,27 @@
+{
+  "info": {
+    "name": "Product Search and Consistent Hashing",
+    "description": "Member 2 service. Set baseUrl, jwt, newShardUri, and database variables before use.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key":"baseUrl","value":"http://localhost:8085"},
+    {"key":"authBaseUrl","value":"http://localhost:8082"},
+    {"key":"jwt","value":"PASTE_ACCESS_TOKEN_HERE"},
+    {"key":"newShardName","value":"shard4"},
+    {"key":"newShardUri","value":"mongodb+srv://USER:PASSWORD@NEW_CLUSTER_HOST/products?retryWrites=true&w=majority"},
+    {"key":"database","value":"products"}
+  ],
+  "item": [
+    {"name":"Health (public)","request":{"method":"GET","url":"{{baseUrl}}/api/health"}},
+    {"name":"Login (copy accessToken to jwt variable)","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"email\": \"demo@example.com\",\n  \"password\": \"DemoPassword123\"\n}"},"url":"{{authBaseUrl}}/api/auth/login"}},
+    {"name":"Browse products (public)","request":{"method":"GET","url":"{{baseUrl}}/api/products"}},
+    {"name":"Search laptops (public)","request":{"method":"GET","url":"{{baseUrl}}/api/search?q=laptop"}},
+    {"name":"Search category (public)","request":{"method":"GET","url":"{{baseUrl}}/api/search?category=Electronics"}},
+    {"name":"Add product (JWT)","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{jwt}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"id\": \"P2001\",\n  \"name\": \"ThinkPad Laptop\",\n  \"description\": \"Business laptop with 16 GB RAM\",\n  \"category\": \"Laptops\",\n  \"brand\": \"Lenovo\",\n  \"price\": 74999,\n  \"stock\": 12\n}"},"url":"{{baseUrl}}/api/products"}},
+    {"name":"Shard list (JWT)","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{jwt}}"}],"url":"{{baseUrl}}/api/shards"}},
+    {"name":"Shard distribution (JWT)","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{jwt}}"}],"url":"{{baseUrl}}/api/shards/distribution"}},
+    {"name":"Add shard and rebalance (JWT)","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{jwt}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"{{newShardName}}\",\n  \"uri\": \"{{newShardUri}}\",\n  \"database\": \"{{database}}\"\n}"},"url":"{{baseUrl}}/api/shards"}},
+    {"name":"Remove shard (JWT)","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{jwt}}"}],"url":"{{baseUrl}}/api/shards/{{newShardName}}"}}
+  ]
+}
