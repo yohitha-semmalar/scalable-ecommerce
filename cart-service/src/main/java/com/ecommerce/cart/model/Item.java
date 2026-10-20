@@ -1,0 +1,2 @@
+package com.ecommerce.cart.model;
+public class Item { private String productId; private int quantity; public Item(){} public Item(String p,int q){productId=p;quantity=q;} public String getProductId(){return productId;} public void setProductId(String v){productId=v;} public int getQuantity(){return quantity;} public void setQuantity(int v){quantity=v;} }

@@ -1,0 +1,2 @@
+package com.ecommerce.cart.dto;
+import jakarta.validation.constraints.*; public class ItemRequest {@NotBlank private String productId; @NotNull @Min(1) private Integer quantity; public String getProductId(){return productId;} public void setProductId(String v){productId=v;} public Integer getQuantity(){return quantity;} public void setQuantity(Integer v){quantity=v;}}
