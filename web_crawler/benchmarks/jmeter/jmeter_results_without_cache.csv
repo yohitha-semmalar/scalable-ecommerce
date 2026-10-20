@@ -1,0 +1,5 @@
+Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throughput,Received KB/sec,Sent KB/sec
+Search AirPods (Cached),100,441,646,902,998,1094,7,1144,0.000%,10.35411,6.52,1.41
+Search iPhone (Warm Cache),2000,523,490,1072,1126,1190,5,1236,0.000%,114.75128,72.89,15.80
+High Concurrency Search,5000,735,803,1142,1177,1215,6,1246,0.000%,285.94304,183.72,38.81
+TOTAL,7100,671,687,1126,1170,1209,5,1246,0.000%,405.80704,259.83,55.31

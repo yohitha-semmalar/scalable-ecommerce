@@ -1,0 +1,7 @@
+scenario,users,throughput,average,median,p95,p99,errorRate
+"Low Load (Cold Cache)",10,77.0,114.5,106.8,109.5,371.1,0.0
+"Low Load (Warm Cache)",10,1682.4,5.4,5.3,6.8,7.3,0.0
+"Medium Load (Warm Cache)",100,2135.4,22.8,22.2,39.1,46.8,0.0
+"Medium Load (Diverse Searches)",100,2270.8,20.0,19.6,34.4,42.5,0.0
+"Cache Bypassed (Crawl Stress)",50,367.1,109.6,108.3,111.7,226.0,0.0
+"High Load (500 Users Concurrency)",500,2215.5,22.5,21.1,39.5,48.2,0.0

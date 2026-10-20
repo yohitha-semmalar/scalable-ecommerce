@@ -1,0 +1,14 @@
+{
+  "name": "mock-ecommerce-stores",
+  "version": "1.0.0",
+  "description": "Simulated e-commerce competitor stores (Amazon, Flipkart, Meesho, Instamart) for web crawler load testing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:amazon": "STORE=amazon PORT=8085 node server.js",
+    "start:flipkart": "STORE=flipkart PORT=8086 node server.js",
+    "start:meesho": "STORE=meesho PORT=8087 node server.js",
+    "start:instamart": "STORE=instamart PORT=8088 node server.js"
+  },
+  "dependencies": {}
+}

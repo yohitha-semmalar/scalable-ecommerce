@@ -1,0 +1,66 @@
+{
+  "source": "Member 5 \u2014 Apache JMeter / Automated Load Test Suite",
+  "simulated": false,
+  "results": [
+    {
+      "scenario": "Low Load (Cold Cache)",
+      "users": 10,
+      "throughput": 77.0,
+      "average": 114.5,
+      "median": 106.8,
+      "p95": 109.5,
+      "p99": 371.1,
+      "errorRate": 0.0
+    },
+    {
+      "scenario": "Low Load (Warm Cache)",
+      "users": 10,
+      "throughput": 1682.4,
+      "average": 5.4,
+      "median": 5.3,
+      "p95": 6.8,
+      "p99": 7.3,
+      "errorRate": 0.0
+    },
+    {
+      "scenario": "Medium Load (Warm Cache)",
+      "users": 100,
+      "throughput": 2135.4,
+      "average": 22.8,
+      "median": 22.2,
+      "p95": 39.1,
+      "p99": 46.8,
+      "errorRate": 0.0
+    },
+    {
+      "scenario": "Medium Load (Diverse Searches)",
+      "users": 100,
+      "throughput": 2270.8,
+      "average": 20.0,
+      "median": 19.6,
+      "p95": 34.4,
+      "p99": 42.5,
+      "errorRate": 0.0
+    },
+    {
+      "scenario": "Cache Bypassed (Crawl Stress)",
+      "users": 50,
+      "throughput": 367.1,
+      "average": 109.6,
+      "median": 108.3,
+      "p95": 111.7,
+      "p99": 226.0,
+      "errorRate": 0.0
+    },
+    {
+      "scenario": "High Load (500 Users Concurrency)",
+      "users": 500,
+      "throughput": 2215.5,
+      "average": 22.5,
+      "median": 21.1,
+      "p95": 39.5,
+      "p99": 48.2,
+      "errorRate": 0.0
+    }
+  ]
+}

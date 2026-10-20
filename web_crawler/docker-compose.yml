@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  crawler-redis:
+    image: redis:7-alpine
+    container_name: scaleshop-crawler-redis
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-lru"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-crawler-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - crawler-net
+
+  mock-amazon:
+    build:
+      context: ./mock_stores
+      dockerfile: Dockerfile
+    container_name: scaleshop-mock-amazon
+    environment:
+      - STORE=amazon
+      - PORT=8085
+      - MOCK_DELAY_MS=${MOCK_DELAY_MS:-0}
+      - MOCK_FAIL_RATE=${MOCK_FAIL_RATE:-0.0}
+    ports:
+      - "8085:8085"
+    networks:
+      - crawler-net
+
+  mock-flipkart:
+    build:
+      context: ./mock_stores
+      dockerfile: Dockerfile
+    container_name: scaleshop-mock-flipkart
+    environment:
+      - STORE=flipkart
+      - PORT=8086
+      - MOCK_DELAY_MS=${MOCK_DELAY_MS:-0}
+      - MOCK_FAIL_RATE=${MOCK_FAIL_RATE:-0.0}
+    ports:
+      - "8086:8086"
+    networks:
+      - crawler-net
+
+  mock-meesho:
+    build:
+      context: ./mock_stores
+      dockerfile: Dockerfile
+    container_name: scaleshop-mock-meesho
+    environment:
+      - STORE=meesho
+      - PORT=8087
+      - MOCK_DELAY_MS=${MOCK_DELAY_MS:-0}
+      - MOCK_FAIL_RATE=${MOCK_FAIL_RATE:-0.0}
+    ports:
+      - "8087:8087"
+    networks:
+      - crawler-net
+
+  mock-instamart:
+    build:
+      context: ./mock_stores
+      dockerfile: Dockerfile
+    container_name: scaleshop-mock-instamart
+    environment:
+      - STORE=instamart
+      - PORT=8088
+      - MOCK_DELAY_MS=${MOCK_DELAY_MS:-0}
+      - MOCK_FAIL_RATE=${MOCK_FAIL_RATE:-0.0}
+    ports:
+      - "8088:8088"
+    networks:
+      - crawler-net
+
+  crawler-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scaleshop-web-crawler
+    depends_on:
+      crawler-redis:
+        condition: service_healthy
+      mock-amazon:
+        condition: service_started
+      mock-flipkart:
+        condition: service_started
+      mock-meesho:
+        condition: service_started
+      mock-instamart:
+        condition: service_started
+    environment:
+      - PORT=8081
+      - SPRING_DATA_REDIS_HOST=crawler-redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - AMAZON_MOCK_URL=http://mock-amazon:8085
+      - FLIPKART_MOCK_URL=http://mock-flipkart:8086
+      - MEESHO_MOCK_URL=http://mock-meesho:8087
+      - INSTAMART_MOCK_URL=http://mock-instamart:8088
+      - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-60}
+      - RATE_LIMIT_RPS=${RATE_LIMIT_RPS:-5}
+      - LOCK_TTL_SECONDS=${LOCK_TTL_SECONDS:-5}
+      - BACKGROUND_INTERVAL_SECONDS=${BACKGROUND_INTERVAL_SECONDS:-300}
+    ports:
+      - "8081:8081"
+    networks:
+      - crawler-net
+
+volumes:
+  redis-crawler-data:
+    driver: local
+
+networks:
+  crawler-net:
+    driver: bridge
