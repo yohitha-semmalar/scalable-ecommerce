@@ -19,4 +19,38 @@ public class ProductController {
  @GetMapping("/shards/distribution") public Map<String,Object> distribution(){return products.distribution();}
  @PostMapping("/shards") public Map<String,Object> add(@RequestBody Map<String,String>b){String n=b.get("name");try{return products.addShard(n,b.get("uri"),b.get("database"));}catch(IllegalArgumentException e){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());}}
  @DeleteMapping("/shards/{name}") public Map<String,Object> remove(@PathVariable String name){try{return products.removeShard(name);}catch(IllegalArgumentException e){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());}}
+
+ @PatchMapping("/products/{id}/stock")
+ public Product decreaseStock(
+         @PathVariable String id,
+         @RequestBody Map<String, Integer> body) {
+
+  Integer quantity = body.get("quantity");
+
+  if (quantity == null || quantity <= 0) {
+   throw new ResponseStatusException(
+           HttpStatus.BAD_REQUEST,
+           "Quantity must be greater than zero"
+   );
+  }
+
+  return products.decreaseStock(id, quantity);
+ }
+
+ @PatchMapping("/products/{id}/stock/increase")
+ public Product increaseStock(
+         @PathVariable String id,
+         @RequestBody Map<String, Integer> body) {
+
+  Integer quantity = body.get("quantity");
+
+  if (quantity == null || quantity <= 0) {
+   throw new ResponseStatusException(
+           HttpStatus.BAD_REQUEST,
+           "Quantity must be greater than zero"
+   );
+  }
+
+  return products.increaseStock(id, quantity);
+ }
 }

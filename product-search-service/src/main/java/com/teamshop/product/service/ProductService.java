@@ -21,6 +21,9 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ProductService {
@@ -183,4 +186,72 @@ public class ProductService {
     private List<Product> getCache(String key){try{String v=redis.opsForValue().get(key);return v==null?null:mapper.readValue(v,new TypeReference<List<Product>>(){});}catch(Exception e){return null;}}
     private void putCache(String key,List<Product> values){try{redis.opsForValue().set(key,mapper.writeValueAsString(values),Duration.ofMinutes(5));}catch(Exception ignored){}}
     private void invalidate(){try{Set<String> keys=redis.keys("product:*");if(keys!=null&&!keys.isEmpty())redis.delete(keys);}catch(Exception ignored){}}
+
+    public Product decreaseStock(String id, int quantity) {
+        if (quantity <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        MongoTemplate template = templates.get(router.getShard(id));
+
+        Query query = new Query(
+                Criteria.where("_id").is(id)
+                        .and("stock").gte(quantity)
+        );
+
+        Update update = new Update().inc("stock", -quantity);
+
+        var result = template.updateFirst(query, update, Product.class);
+
+        if (result.getModifiedCount() == 0) {
+            Product product = template.findById(id, Product.class);
+
+            if (product == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Product not found"
+                );
+            }
+
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Insufficient stock"
+            );
+        }
+
+        invalidate();
+        return template.findById(id, Product.class);
+    }
+
+    public Product increaseStock(String id, int quantity) {
+        if (quantity <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        MongoTemplate template = templates.get(router.getShard(id));
+
+        Query query = new Query(
+                Criteria.where("_id").is(id)
+        );
+
+        Update update = new Update().inc("stock", quantity);
+
+        var result = template.updateFirst(query, update, Product.class);
+
+        if (result.getMatchedCount() == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Product not found"
+            );
+        }
+
+        invalidate();
+        return template.findById(id, Product.class);
+    }
 }
