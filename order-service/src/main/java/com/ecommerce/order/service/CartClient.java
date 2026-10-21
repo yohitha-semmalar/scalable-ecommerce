@@ -1,0 +1,9 @@
+package com.ecommerce.order.service;
+import com.ecommerce.order.dto.CartResponse; import org.springframework.beans.factory.annotation.Value; import org.springframework.http.*; import org.springframework.stereotype.Component; import org.springframework.web.client.*;
+@Component public class CartClient {
+ private final RestClient c; public CartClient(RestClient.Builder b,@Value("${app.cart-service.url}")String u){c=b.baseUrl(u).build();}
+ public CartResponse getCart(String token){try{CartResponse x=c.get().uri("/api/cart").header(HttpHeaders.AUTHORIZATION,token).retrieve().body(CartResponse.class);if(x==null)throw new ServiceException(HttpStatus.BAD_GATEWAY,"INVALID_CART_RESPONSE","Cart Service returned an empty response.");return x;}
+ catch(ResourceAccessException e){throw new ServiceException(HttpStatus.SERVICE_UNAVAILABLE,"CART_UNAVAILABLE","Cart Service is unavailable.");}catch(RestClientResponseException e){throw new ServiceException(e.getStatusCode().is5xxServerError()?HttpStatus.SERVICE_UNAVAILABLE:HttpStatus.BAD_GATEWAY,"CART_REQUEST_FAILED","Cart Service could not provide the cart.");}}
+ public void clearCart(String token){try{c.delete().uri("/api/cart").header(HttpHeaders.AUTHORIZATION,token).retrieve().toBodilessEntity();}
+ catch(ResourceAccessException e){throw new ServiceException(HttpStatus.SERVICE_UNAVAILABLE,"CART_CLEAR_FAILED","Order is saved, but Cart Service could not be reached to clear the cart.");}catch(RestClientResponseException e){throw new ServiceException(HttpStatus.BAD_GATEWAY,"CART_CLEAR_FAILED","Order is saved, but Cart Service did not clear the cart.");}}
+}

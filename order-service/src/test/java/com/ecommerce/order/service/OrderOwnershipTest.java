@@ -1,0 +1,10 @@
+package com.ecommerce.order.service;
+import com.ecommerce.order.model.*;import com.ecommerce.order.repository.OrderRepository;import java.math.BigDecimal;import java.time.Instant;import java.util.Optional;
+import org.junit.jupiter.api.Test;import org.junit.jupiter.api.extension.ExtendWith;import org.mockito.InjectMocks;import org.mockito.Mock;import org.mockito.junit.jupiter.MockitoExtension;import static org.junit.jupiter.api.Assertions.*;import static org.mockito.Mockito.*;
+@ExtendWith(MockitoExtension.class) class OrderOwnershipTest {
+ @Mock OrderRepository repo;@Mock CartClient carts;@Mock ProductClient products;@InjectMocks OrderService service;
+ @Test void anotherUsersOrderIsNotFound(){when(repo.findByIdAndUserId("order-B","user-A")).thenReturn(Optional.empty());ServiceException e=assertThrows(ServiceException.class,()->service.get("order-B","user-A"));assertEquals(404,e.getStatus().value());}
+ @Test void anotherUsersOrderCannotBeCancelled(){when(repo.findByIdAndUserId("order-B","user-A")).thenReturn(Optional.empty());ServiceException e=assertThrows(ServiceException.class,()->service.cancel("order-B","user-A"));assertEquals(404,e.getStatus().value());verify(repo,never()).save(any());}
+ @Test void placedOrderCanBeCancelled(){Order o=new Order();o.setId("o1");o.setUserId("u1");o.setItems(java.util.List.of());o.setTotalAmount(BigDecimal.ZERO);o.setStatus(OrderStatus.PLACED);o.setCreatedAt(Instant.now());o.setUpdatedAt(Instant.now());when(repo.findByIdAndUserId("o1","u1")).thenReturn(Optional.of(o));when(repo.save(any())).thenAnswer(i->i.getArgument(0));assertEquals(OrderStatus.CANCELLED,service.cancel("o1","u1").status());}
+ @Test void cancelledOrderCannotBeCancelledAgain(){Order o=new Order();o.setId("o1");o.setUserId("u1");o.setStatus(OrderStatus.CANCELLED);when(repo.findByIdAndUserId("o1","u1")).thenReturn(Optional.of(o));ServiceException e=assertThrows(ServiceException.class,()->service.cancel("o1","u1"));assertEquals(409,e.getStatus().value());}
+}
